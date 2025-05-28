@@ -48,3 +48,17 @@ jobs:
             -destination 'platform=iOS Simulator,name=iPhone 14' \
             CODE_SIGNING_ALLOWED=NO \
             DEVELOPMENT_TEAM=5Y5H7652QW
+
+      - name: Find .app path
+        run: find iosApp/build -type d -name "*.app"
+
+      - name: Zip .app bundle
+        run: |
+          cd iosApp/build/Build/Products/Debug-iphonesimulator
+          zip -r iosApp.zip iosApp.app
+
+      - name: Upload .app as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iosApp
+          path: iosApp/build/Build/Products/Debug-iphonesimulator/iosApp.zip
