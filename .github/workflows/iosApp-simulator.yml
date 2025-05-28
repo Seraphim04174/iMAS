@@ -38,23 +38,28 @@ jobs:
 
       - name: Build iOS app for Simulator
         run: |
-          mkdir -p build/simulator
           xcodebuild clean build \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -sdk iphonesimulator \
             -configuration Debug \
             -destination 'platform=iOS Simulator,name=iPhone 14' \
-            CODE_SIGNING_ALLOWED=NO \
-            CONFIGURATION_BUILD_DIR=build/simulator
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Locate .app file
+        run: |
+          echo "Searching for .app..."
+          find ~/Library/Developer/Xcode/DerivedData -type d -name "*.app"
+
+      - name: Copy .app to known location
+        run: |
+          mkdir -p build/simulator
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "iosApp.app" | head -n 1)
+          echo "Found app at: $APP_PATH"
+          cp -R "$APP_PATH" build/simulator/
 
       - name: Zip .app
         run: |
           cd build/simulator
           zip -r iosApp.zip iosApp.app
 
-      - name: Upload .app as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: iosApp-simulator
-          path: build/simulator/iosApp.zip
