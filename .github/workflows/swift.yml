@@ -1,4 +1,4 @@
-name: Build iOS App (KMM)
+name: Build iOS App (KMM no CocoaPods)
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17 (для KMM)
+      - name: Set up JDK 17 (Kotlin)
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -23,20 +23,18 @@ jobs:
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Build shared module
+      - name: Build shared KMM module
         run: ./gradlew :shared:build
 
-      - name: Install CocoaPods dependencies
-        run: |
-          cd iosApp
-          pod install
+      - name: Debug Xcode schemes
+        run: xcodebuild -list -project iosApp/iosApp.xcodeproj
 
-      - name: Build iOS App
+      # После выполнения предыдущего шага, зайди в GitHub Actions и посмотри название схемы.
+      # Например, если в выводе Debug Xcode schemes будет "iOSApp", то укажи это в -scheme ниже.
+      - name: Build iOS app with xcodebuild
         run: |
           xcodebuild clean build \
-            -workspace iosApp/iosApp.xcworkspace \
-            -scheme iosApp \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iOSApp \  # <- замените 'iOSApp' на фактическое имя схемы
             -sdk iphonesimulator \
             -destination 'platform=iOS Simulator,name=iPhone 14'
-
-      # (опционально) Артефакты и .ipa можно добавить позже
