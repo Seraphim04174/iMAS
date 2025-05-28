@@ -38,12 +38,13 @@ jobs:
 
       - name: Debug Xcode schemes
         run: xcodebuild -list -project iosApp/iosApp.xcodeproj
-        
+
       - name: Build iOS app with xcodebuild
         run: |
           xcodebuild clean build \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 14'
-
+            -destination 'platform=iOS Simulator,name=iPhone 14' \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM=5Y5H7652QW
