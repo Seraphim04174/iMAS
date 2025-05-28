@@ -43,7 +43,7 @@ jobs:
         run: |
           xcodebuild clean build \
             -project iosApp/iosApp.xcodeproj \
-            -scheme iOSApp \
+            -scheme iosApp \
             -sdk iphonesimulator \
             -destination 'platform=iOS Simulator,name=iPhone 14'
 
