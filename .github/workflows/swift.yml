@@ -36,7 +36,7 @@ jobs:
       - name: Build shared KMM module
         run: ./gradlew :shared:build
 
-      - name: Build for iOS Simulator
+      - name: Build iOS app for Simulator
         run: |
           xcodebuild clean build \
             -project iosApp/iosApp.xcodeproj \
@@ -45,14 +45,20 @@ jobs:
             -destination 'platform=iOS Simulator,name=iPhone 14' \
             CODE_SIGNING_ALLOWED=NO
 
-      - name: Locate built .app
-        id: locate_app
+      - name: Find .app for simulator
         run: |
-          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "iosApp.app" | head -n 1)
-          echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
+          mkdir -p build/simulator
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "*.app" | grep "Debug-iphonesimulator" | head -n 1)
+          echo "Found app at $APP_PATH"
+          cp -R "$APP_PATH" build/simulator/
 
-      - name: Upload .app as artifact
+      - name: Zip .app for Appetize
+        run: |
+          cd build/simulator
+          zip -r iosApp-simulator.zip *.app
+
+      - name: Upload iOS simulator .app as artifact
         uses: actions/upload-artifact@v4
         with:
           name: iosApp-simulator
-          path: ${{ env.APP_PATH }}
+          path: build/simulator/iosApp-simulator.zip
