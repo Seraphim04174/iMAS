@@ -1,0 +1,42 @@
+name: Build iOS App (KMM)
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 (для KMM)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Build shared module
+        run: ./gradlew :shared:build
+
+      - name: Install CocoaPods dependencies
+        run: |
+          cd iosApp
+          pod install
+
+      - name: Build iOS App
+        run: |
+          xcodebuild clean build \
+            -workspace iosApp/iosApp.xcworkspace \
+            -scheme iosApp \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 14'
+
+      # (опционально) Артефакты и .ipa можно добавить позже
