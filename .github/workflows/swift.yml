@@ -44,21 +44,20 @@ jobs:
           xcodebuild clean build \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 14' \
+            -sdk iphoneos \
+            -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             DEVELOPMENT_TEAM=5Y5H7652QW
 
-      - name: Find .app path
-        run: find iosApp/build -type d -name "*.app"
-
-      - name: Zip .app bundle
+      - name: Find and archive .app bundle
         run: |
-          cd iosApp/build/Build/Products/Debug-iphonesimulator
-          zip -r iosApp.zip iosApp.app
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "*.app" | grep Debug-iphoneos | head -n 1)
+          echo "App found at: $APP_PATH"
+          zip -r iosApp.zip "$APP_PATH"
+        shell: bash
 
-      - name: Upload .app as artifact
+      - name: Upload .app artifact
         uses: actions/upload-artifact@v4
         with:
           name: iosApp
-          path: iosApp/build/Build/Products/Debug-iphonesimulator/iosApp.zip
+          path: iosApp.zip
