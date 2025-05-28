@@ -36,28 +36,23 @@ jobs:
       - name: Build shared KMM module
         run: ./gradlew :shared:build
 
-      - name: Debug Xcode schemes
-        run: xcodebuild -list -project iosApp/iosApp.xcodeproj
-
-      - name: Build iOS app with xcodebuild
+      - name: Build for iOS Simulator
         run: |
           xcodebuild clean build \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
-            -sdk iphoneos \
-            -configuration Debug \
-            CODE_SIGNING_ALLOWED=NO \
-            DEVELOPMENT_TEAM=5Y5H7652QW
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 14' \
+            CODE_SIGNING_ALLOWED=NO
 
-      - name: Find and archive .app bundle
+      - name: Locate built .app
+        id: locate_app
         run: |
-          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "*.app" | grep Debug-iphoneos | head -n 1)
-          echo "App found at: $APP_PATH"
-          zip -r iosApp.zip "$APP_PATH"
-        shell: bash
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "iosApp.app" | head -n 1)
+          echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
 
-      - name: Upload .app artifact
+      - name: Upload .app as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: iosApp
-          path: iosApp.zip
+          name: iosApp-simulator
+          path: ${{ env.APP_PATH }}
