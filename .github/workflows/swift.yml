@@ -38,13 +38,12 @@ jobs:
 
       - name: Debug Xcode schemes
         run: xcodebuild -list -project iosApp/iosApp.xcodeproj
-
-      # После выполнения предыдущего шага, зайди в GitHub Actions и посмотри название схемы.
-      # Например, если в выводе Debug Xcode schemes будет "iOSApp", то укажи это в -scheme ниже.
+        
       - name: Build iOS app with xcodebuild
         run: |
           xcodebuild clean build \
             -project iosApp/iosApp.xcodeproj \
-            -scheme iOSApp \  # <- Замените 'iOSApp' на фактическое имя схемы из вывода предыдущего шага
+            -scheme iOSApp \
             -sdk iphonesimulator \
             -destination 'platform=iOS Simulator,name=iPhone 14'
+
