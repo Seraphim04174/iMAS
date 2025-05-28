@@ -1,4 +1,4 @@
-name: Build iOS App (KMM no CocoaPods)
+name: Build iOS App (KMM for Simulator)
 
 on:
   push:
@@ -36,25 +36,25 @@ jobs:
       - name: Build shared KMM module
         run: ./gradlew :shared:build
 
-      - name: Debug Xcode schemes
-        run: xcodebuild -list -project iosApp/iosApp.xcodeproj
-
-      - name: Build iOS Simulator App
+      - name: Build iOS app for Simulator
         run: |
+          mkdir -p build/simulator
           xcodebuild clean build \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -sdk iphonesimulator \
+            -configuration Debug \
             -destination 'platform=iOS Simulator,name=iPhone 14' \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            CONFIGURATION_BUILD_DIR=build/simulator
 
-      - name: Find built .app
+      - name: Zip .app
         run: |
-          find ~/Library/Developer/Xcode/DerivedData -name "*.app" -print
+          cd build/simulator
+          zip -r iosApp.zip iosApp.app
 
-      - name: Upload .app for Simulator
+      - name: Upload .app as artifact
         uses: actions/upload-artifact@v4
         with:
           name: iosApp-simulator
-          path: |
-            ~/Library/Developer/Xcode/DerivedData/**/Build/Products/**/iosApp.app
+          path: build/simulator/iosApp.zip
