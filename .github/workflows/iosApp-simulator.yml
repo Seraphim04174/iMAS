@@ -28,7 +28,7 @@ jobs:
       - name: Build iOS App for Simulator (Appetize)
         run: |
           xcodebuild clean build \
-            -project iosApp/iosApp.xcodeproj \ 
+            -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -sdk iphonesimulator \
             -configuration Debug \
