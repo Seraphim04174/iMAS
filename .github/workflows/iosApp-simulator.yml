@@ -53,7 +53,7 @@ jobs:
       - name: Copy .app to build directory
         run: |
           mkdir -p build/simulator
-          cp -R build/xcodebuild/Build/Products/Debug-iphonesimulator/iosApp.app build/simulator/
+          cp -R build/xcodebuild/Build/Products/Debug-iphoneos/iosApp.app build/simulator/
 
       - name: Zip .app
         run: |
