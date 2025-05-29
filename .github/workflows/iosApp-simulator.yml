@@ -1,4 +1,4 @@
-name: Build iOS App (KMM no CocoaPods)
+name: Build iOS App for Simulator
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build-ios:
+  build-ios-simulator:
     runs-on: macos-latest
 
     steps:
@@ -24,7 +24,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Set up JDK 17 (Kotlin)
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -42,21 +42,25 @@ jobs:
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -sdk iphonesimulator \
+            -configuration Debug \
             -destination 'platform=iOS Simulator,name=iPhone 14' \
             -derivedDataPath build/xcodebuild \
             CODE_SIGNING_ALLOWED=NO
 
-      - name: Copy .app to known location
+      - name: Find built .app
+        run: find build/xcodebuild -name "*.app" -type d
+
+      - name: Copy .app to build directory
         run: |
           mkdir -p build/simulator
           cp -R build/xcodebuild/Build/Products/Debug-iphonesimulator/iosApp.app build/simulator/
 
-      - name: Zip .app for Appetize
+      - name: Zip .app
         run: |
           cd build/simulator
           zip -r iosApp-simulator.zip iosApp.app
 
-      - name: Upload iOS simulator .app as artifact
+      - name: Upload simulator .app as artifact
         uses: actions/upload-artifact@v4
         with:
           name: iosApp-simulator
