@@ -51,7 +51,6 @@ jobs:
             -exportOptionsPlist iosApp/ExportOptions.plist \
             -exportPath build/export
 
-
       - name: Upload .ipa
         uses: actions/upload-artifact@v4
         with:
