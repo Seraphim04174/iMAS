@@ -1,4 +1,4 @@
-name: Build iOS App for Simulator
+name: Build iOS App for Device (.ipa)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build-ios-simulator:
+  build-ios-ipa:
     runs-on: macos-latest
 
     steps:
@@ -36,26 +36,22 @@ jobs:
       - name: Build shared KMM module
         run: ./gradlew :shared:build
 
-      - name: Build iOS App for Simulator (Appetize)
+      - name: Build .ipa for real device
         run: |
-          xcodebuild clean build \
-            -project iosApp/iosApp.xcodeproj \
+          xcodebuild -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
-            -sdk iphonesimulator \
-            -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 14' \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGN_IDENTITY="" \
-            CONFIGURATION_BUILD_DIR=build/simulator
-      - name: Zip .app
-        run: |
-          cd iosApp/build/simulator
-          zip -r iosApp-simulator.zip iosApp.app
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath build/iosApp.xcarchive \
+            archive
 
-      - name: Upload simulator .app as artifact
+          xcodebuild -exportArchive \
+            -archivePath build/iosApp.xcarchive \
+            -exportOptionsPlist iosApp/ExportOptions.plist \
+            -exportPath build/export
+
+      - name: Upload .ipa
         uses: actions/upload-artifact@v4
         with:
-          name: iosApp-simulator
-          path: iosApp/build/simulator/iosApp-simulator.zip
-
+          name: iosApp-ipa
+          path: build/export/iosApp.ipa
