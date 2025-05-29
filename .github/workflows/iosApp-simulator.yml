@@ -25,15 +25,19 @@ jobs:
       - name: Build shared KMM module
         run: ./gradlew :shared:build
 
-      - name: Build iOS App for Simulator
+      - name: Build iOS App for Simulator (Appetize)
         run: |
           xcodebuild clean build \
-            -project iosApp/iosApp.xcodeproj \
+            -project iosApp/iosApp.xcodeproj \ 
             -scheme iosApp \
             -sdk iphonesimulator \
             -configuration Debug \
             -destination 'platform=iOS Simulator,name=iPhone 14' \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
             CONFIGURATION_BUILD_DIR=build/simulator
+
 
       - name: Package .app into zip
         run: |
