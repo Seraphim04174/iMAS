@@ -45,17 +45,15 @@ jobs:
             -destination 'platform=iOS Simulator,name=iPhone 14' \
             CODE_SIGNING_ALLOWED=NO
 
-      - name: Find .app for simulator
+      - name: Copy .app to known location
         run: |
           mkdir -p build/simulator
-          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "*.app" | grep "Debug-iphonesimulator" | head -n 1)
-          echo "Found app at $APP_PATH"
-          cp -R "$APP_PATH" build/simulator/
+          cp -R iosApp/build/Build/Products/Debug-iphonesimulator/iosApp.app build/simulator/
 
       - name: Zip .app for Appetize
         run: |
           cd build/simulator
-          zip -r iosApp-simulator.zip *.app
+          zip -r iosApp-simulator.zip iosApp.app
 
       - name: Upload iOS simulator .app as artifact
         uses: actions/upload-artifact@v4
