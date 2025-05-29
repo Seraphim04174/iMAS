@@ -1,4 +1,4 @@
-name: Build iOS App (KMM for Simulator)
+name: Build iOS App (KMM no CocoaPods)
 
 on:
   push:
@@ -42,24 +42,22 @@ jobs:
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -sdk iphonesimulator \
-            -configuration Debug \
             -destination 'platform=iOS Simulator,name=iPhone 14' \
+            -derivedDataPath build/xcodebuild \
             CODE_SIGNING_ALLOWED=NO
-
-      - name: Locate .app file
-        run: |
-          echo "Searching for .app..."
-          find ~/Library/Developer/Xcode/DerivedData -type d -name "*.app"
 
       - name: Copy .app to known location
         run: |
           mkdir -p build/simulator
-          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "iosApp.app" | head -n 1)
-          echo "Found app at: $APP_PATH"
-          cp -R "$APP_PATH" build/simulator/
+          cp -R build/xcodebuild/Build/Products/Debug-iphonesimulator/iosApp.app build/simulator/
 
-      - name: Zip .app
+      - name: Zip .app for Appetize
         run: |
           cd build/simulator
-          zip -r iosApp.zip iosApp.app
+          zip -r iosApp-simulator.zip iosApp.app
 
+      - name: Upload iOS simulator .app as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iosApp-simulator
+          path: build/simulator/iosApp-simulator.zip
