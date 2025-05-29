@@ -43,12 +43,13 @@ jobs:
             -scheme iosApp \
             -sdk iphonesimulator \
             -destination 'platform=iOS Simulator,name=iPhone 14' \
+            -derivedDataPath build/xcodebuild \
             CODE_SIGNING_ALLOWED=NO
 
       - name: Copy .app to known location
         run: |
           mkdir -p build/simulator
-          cp -R iosApp/build/Build/Products/Debug-iphonesimulator/iosApp.app build/simulator/
+          cp -R build/xcodebuild/Build/Products/Debug-iphonesimulator/iosApp.app build/simulator/
 
       - name: Zip .app for Appetize
         run: |
