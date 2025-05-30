@@ -44,12 +44,14 @@ jobs:
             -configuration Release \
             -archivePath build/iosApp.xcarchive \
             DEVELOPMENT_TEAM=5Y5H7652QW \
+            -allowProvisioningUpdates \
             archive
       
           xcodebuild -exportArchive \
             -archivePath build/iosApp.xcarchive \
             -exportOptionsPlist iosApp/ExportOptions.plist \
             -exportPath build/export
+
 
       - name: Upload .ipa
         uses: actions/upload-artifact@v4
