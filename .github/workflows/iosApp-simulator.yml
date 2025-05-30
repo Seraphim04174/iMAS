@@ -36,6 +36,7 @@ jobs:
       - name: Build shared KMM module
         run: ./gradlew :shared:build
 
+        
       - name: Build .ipa for real device
         run: |
           xcodebuild -project iosApp/iosApp.xcodeproj \
