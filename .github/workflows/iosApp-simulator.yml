@@ -35,7 +35,14 @@ jobs:
 
       - name: Build shared KMM module
         run: ./gradlew :shared:build
-        
+
+      - name: Set up App Store Connect API Key (no .p12 needed)
+        uses: apple-actions/import-codesign-certs@v2
+        with:
+          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+          issuer-id: ${{ secrets.APPSTORE_API_ISSUER_ID }}
+          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+
       - name: Build .ipa for real device
         run: |
           xcodebuild -project iosApp/iosApp.xcodeproj \
@@ -46,12 +53,11 @@ jobs:
             DEVELOPMENT_TEAM=5Y5H7652QW \
             -allowProvisioningUpdates \
             archive
-      
+
           xcodebuild -exportArchive \
             -archivePath build/iosApp.xcarchive \
             -exportOptionsPlist iosApp/ExportOptions.plist \
             -exportPath build/export
-
 
       - name: Upload .ipa
         uses: actions/upload-artifact@v4
